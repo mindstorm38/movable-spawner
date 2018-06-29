@@ -1,0 +1,26 @@
+/*
+
+	-- Movable Spawner Plugin made with Bukkit API
+
+*/
+
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+
+project.ext.craftbukkit = "1.12.2-R0.1-SNAPSHOT"
+
+version = "1.0.0"
+
+repositories {
+
+    jcenter()
+    mavenCentral()
+    mavenLocal()
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    
+}
+
+dependencies {
+	compileOnly "org.bukkit:craftbukkit:${craftbukkit}"
+}
