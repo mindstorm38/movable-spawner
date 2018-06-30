@@ -2,3 +2,27 @@ name: MovableSpawner
 version: 1.0.0
 author: Mindstorm38
 main: fr.mindstorm38.movablespawner.MovableSpawner
+commands:
+  mstool:
+    description: Give the MovableSpawner tool
+permissions:
+  movablespawner.*:
+    description: All MovableSpawner permissions
+    default: op
+    children:
+       movablespawner.tool: true
+       movablespawner.bypassradius: true
+       movablespawner.bypassdim: true
+       movablespawner.use: false
+  movablespawner.use:
+    description: Allow to break and use mob spawners
+    default: true
+  movablespawner.tool:
+    description: Allow to give MovableSpawner tool with /mstool
+    default: false
+  movablespawner.bypassradius:
+    description: Allow to bypass the minimum radius separating two spawner
+    default: false
+  movablespawner.bypassdim:
+    description: Allow to bypass mob types dimensions restriction
+    default: false
