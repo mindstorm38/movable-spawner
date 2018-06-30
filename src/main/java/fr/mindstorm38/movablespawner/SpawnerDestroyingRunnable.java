@@ -184,9 +184,6 @@ public class SpawnerDestroyingRunnable implements Runnable {
 			
 			this.world.spawnParticle( Particle.PORTAL, this.centerLocation.clone().add( 0f, 0.3f, 0f ), 100 );
 			this.world.playSound( this.spawnerLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 0.5f );
-			// this.world.playSound( this.spawnerLocation, Sound.BLOCK_FIRE_EXTINGUISH, 1.0f, 0.5f );
-			// this.world.playSound( this.spawnerLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 0.5f );
-			// this.world.playSound( this.spawnerLocation, Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.0f, 0.5f );
 			
 		} );
 		
