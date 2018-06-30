@@ -118,16 +118,21 @@ public class EventListener implements Listener {
 						} else {
 							
 							e.setCancelled( true );
-							player.sendMessage( "§cYou must be§r §e" + MovableSpawner.MINIMUM_SPAWNER_SPACEMENT + "§r §cblocks away from other spawners§r" );
+							player.sendMessage( new String[] {
+									"§cVous spawner est trop proche des autre spawners§r",
+									"§c  Il est impossible de poser des spawners dans une zone carrée de§r §e" + MovableSpawner.SPAWNER_ZONE_SIZE_XZ + "x" + MovableSpawner.SPAWNER_ZONE_SIZE_Y + "x" + MovableSpawner.SPAWNER_ZONE_SIZE_XZ + "§r §ccentré sur le spawner§r"
+							} );
 							
 						}
 						
 					} else {
 						
 						e.setCancelled( true );
-						player.sendMessage( "§cYou can't place this type of spawner in this dimension§r" );
+						player.sendMessage( "§cLe type d'entitée contenue dans ce spawner est incompatible avec la dimension du monde actuel§r" );
 						
 					}
+					
+					
 					
 				}
 				

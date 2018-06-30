@@ -28,9 +28,34 @@ public class MovableSpawner extends JavaPlugin {
 	
 	// Constants \\
 	
-	public static final String TOOL_NBT_KEY				= "movable_spawner_tool";
-	public static final String SPAWNER_ITEM_NBT_KEY		= "movable_spawner";
-	public static final int MINIMUM_SPAWNER_SPACEMENT	= 8;
+	public static final int SPAWNER_ZONE_RADIUS_XZ			= 16;
+	public static final int SPAWNER_ZONE_RADIUS_Y			= 24;
+	
+	public static final int SPAWNER_ZONE_SIZE_XZ			= SPAWNER_ZONE_RADIUS_XZ * 2 + 1;
+	public static final int SPAWNER_ZONE_SIZE_Y				= SPAWNER_ZONE_RADIUS_Y * 2 + 1;
+	
+	// - NBT Constants
+	
+	public static final String SPAWNER_TOOL_KEY				= "movable_spawner_tool";
+	
+	public static final String SPAWNER_ITEM_NBT_KEY			= "movable_spawner";
+	public static final String MAX_NEARBY_ENTITY_MS			= "max_nearby_entities";
+	public static final String MAX_NEARBY_ENTITY_RAW		= "MaxNearbyEntities";
+	public static final String REQUIRED_PLAYER_RANGE_MS		= "required_player_range";
+	public static final String REQUIRED_PLAYER_RANGE_RAW	= "RequiredPlayerRange";
+	public static final String SPAWN_COUNT_MS				= "spawn_count";
+	public static final String SPAWN_COUNT_RAW				= "SpawnCount";
+	public static final String MIN_SPAWN_DELAY_MS			= "min_spawn_delay";
+	public static final String MIN_SPAWN_DELAY_RAW			= "MinSpawnDelay";
+	public static final String MAX_SPAWN_DELAY_MS			= "max_spawn_delay";
+	public static final String MAX_SPAWN_DELAY_RAW			= "MaxSpawnDelay";
+	public static final String SPAWN_RANGE_MS				= "spawn_range";
+	public static final String SPAWN_RANGE_RAW				= "SpawnRange";
+	public static final String SPAWN_DATA_MS				= "spawn_data";
+	public static final String SPAWN_DATA_RAW				= "SpawnData";
+	public static final String SPAWN_POTENTIALS_MS			= "spawn_potentials";
+	public static final String SPAWN_POTENTIALS_RAW			= "SpawnPotentials";
+	public static final String ENTITY_TYPE					= "entity_type";
 	
 	// Class \\
 	
@@ -94,7 +119,7 @@ public class MovableSpawner extends JavaPlugin {
 			
 			this.toolItem = NBTUtils.editItemStackNBT( new ItemStack( Material.RECORD_5 ), nbt -> {
 				
-				nbt.setBoolean( TOOL_NBT_KEY, true );
+				nbt.setBoolean( SPAWNER_TOOL_KEY, true );
 				return true;
 				
 			} );
@@ -120,7 +145,7 @@ public class MovableSpawner extends JavaPlugin {
 		if ( item.getType() != this.toolItem.getType() ) return false;
 		
 		return NBTUtils.checkItemStackNBT( item, nbt -> {
-			return nbt.hasKey( TOOL_NBT_KEY );
+			return nbt.hasKey( SPAWNER_TOOL_KEY );
 		} );
 		
 	}
@@ -185,8 +210,8 @@ public class MovableSpawner extends JavaPlugin {
 		
 		final List<String> spawnerItemLores = new ArrayList<>();
 		
-		AtomicReference<EntitySpawnerType> spawnerType = new AtomicReference<EntitySpawnerType>( EntitySpawnerType.UNKNOWN );
-		AtomicInteger spawnerTypeWeight = new AtomicInteger( 0 );
+		AtomicReference<EntitySpawnerType> entityType = new AtomicReference<EntitySpawnerType>( EntitySpawnerType.UNKNOWN );
+		AtomicInteger entityTypeWeight = new AtomicInteger( 0 );
 		
 		ItemStack spawnerItem = NBTUtils.editItemStackNBT( new ItemStack( Material.MOB_SPAWNER ), spawnerItemNbt -> {
 			
@@ -195,63 +220,63 @@ public class MovableSpawner extends JavaPlugin {
 			
 			NBTUtils.editTileEntityNBT( spawnerBlockState, spawnerBlockNbt -> {
 				
-				NBTUtils.getNBTShort( spawnerBlockNbt, "MaxNearbyEntities", maxNearbyEntities -> {
+				NBTUtils.getNBTShort( spawnerBlockNbt, MAX_NEARBY_ENTITY_RAW, maxNearbyEntities -> {
 					
-					movableSpawnerNbt.setShort( "max_nearby_entities", maxNearbyEntities );
+					movableSpawnerNbt.setShort( MAX_NEARBY_ENTITY_MS, maxNearbyEntities );
 					spawnerItemLores.add( "§aMax nearby entities :§r §e" + maxNearbyEntities + "§r" );
 					
 				} );
 				
-				NBTUtils.getNBTShort( spawnerBlockNbt, "RequiredPlayerRange", requiredPlayerRange -> {
+				NBTUtils.getNBTShort( spawnerBlockNbt, REQUIRED_PLAYER_RANGE_RAW, requiredPlayerRange -> {
 					
-					movableSpawnerNbt.setShort( "required_player_range", requiredPlayerRange );
+					movableSpawnerNbt.setShort( REQUIRED_PLAYER_RANGE_MS, requiredPlayerRange );
 					spawnerItemLores.add( "§aRequired player range :§r §e" + requiredPlayerRange + "§r" );
 					
 				} );
 				
-				NBTUtils.getNBTShort( spawnerBlockNbt, "SpawnCount", spawnCount -> {
+				NBTUtils.getNBTShort( spawnerBlockNbt, SPAWN_COUNT_RAW, spawnCount -> {
 					
-					movableSpawnerNbt.setShort( "spawn_count", spawnCount );
+					movableSpawnerNbt.setShort( SPAWN_COUNT_MS, spawnCount );
 					spawnerItemLores.add( "§aSpawn count :§r §e" + spawnCount + "§r" );
 					
 				} );
 				
-				NBTUtils.getNBTShort( spawnerBlockNbt, "MinSpawnDelay", minSpawnDelay -> {
+				NBTUtils.getNBTShort( spawnerBlockNbt, MIN_SPAWN_DELAY_RAW, minSpawnDelay -> {
 					
-					movableSpawnerNbt.setShort( "min_spawn_delay", minSpawnDelay );
+					movableSpawnerNbt.setShort( MIN_SPAWN_DELAY_MS, minSpawnDelay );
 					spawnerItemLores.add( "§aMin spawn delay :§r §e" + minSpawnDelay + "§r" );
 					
 				} );
 				
-				NBTUtils.getNBTShort( spawnerBlockNbt, "MaxSpawnDelay", maxSpawnDelay -> {
+				NBTUtils.getNBTShort( spawnerBlockNbt, MAX_SPAWN_DELAY_RAW, maxSpawnDelay -> {
 					
-					movableSpawnerNbt.setShort( "max_spawn_delay", maxSpawnDelay );
+					movableSpawnerNbt.setShort( MAX_SPAWN_DELAY_MS, maxSpawnDelay );
 					spawnerItemLores.add( "§aMax spawn delay :§r §e" + maxSpawnDelay + "§r" );
 					
 				} );
 				
-				NBTUtils.getNBTShort( spawnerBlockNbt, "SpawnRange", spawnRange -> {
+				NBTUtils.getNBTShort( spawnerBlockNbt, SPAWN_RANGE_RAW, spawnRange -> {
 					
-					movableSpawnerNbt.setShort( "spawn_range", spawnRange );
+					movableSpawnerNbt.setShort( SPAWN_RANGE_MS, spawnRange );
 					spawnerItemLores.add( "§aSpawn range :§r §e" + spawnRange + "§r" );
 					
 				} );
 				
-				NBTUtils.getNBTCompound( spawnerBlockNbt, "SpawnData", spawnData -> {
+				NBTUtils.getNBTCompound( spawnerBlockNbt, SPAWN_DATA_RAW, spawnData -> {
 					
-					movableSpawnerNbt.set( "spawn_data", spawnData );
+					movableSpawnerNbt.set( SPAWN_DATA_MS, spawnData );
 					
 					NBTUtils.getNBTString( spawnData, "id", spawnEntityId -> {
 						
-						spawnerType.set( EntitySpawnerType.getEntitySpawnerType( spawnEntityId ) );
+						entityType.set( EntitySpawnerType.getEntitySpawnerType( spawnEntityId ) );
 						
 					} );
 					
 				} );
 				
-				NBTUtils.getNBTList( spawnerBlockNbt, "SpawnPotentials", spawnPotentials -> {
+				NBTUtils.getNBTList( spawnerBlockNbt, SPAWN_POTENTIALS_RAW, spawnPotentials -> {
 					
-					movableSpawnerNbt.set( "spawn_potentials", spawnPotentials );
+					movableSpawnerNbt.set( SPAWN_POTENTIALS_MS, spawnPotentials );
 					
 					for ( int i = 0; i < spawnPotentials.size(); i++ ) {
 						
@@ -263,10 +288,10 @@ public class MovableSpawner extends JavaPlugin {
 								
 								NBTUtils.getNBTInteger( spawnPotential, "Weight", potentialWeight -> {
 									
-									if ( potentialWeight > spawnerTypeWeight.get() ) {
+									if ( potentialWeight > entityTypeWeight.get() ) {
 										
-										spawnerTypeWeight.set( potentialWeight );
-										spawnerType.set( EntitySpawnerType.getEntitySpawnerType( spawnEntityId ) );
+										entityTypeWeight.set( potentialWeight );
+										entityType.set( EntitySpawnerType.getEntitySpawnerType( spawnEntityId ) );
 										
 									}
 									
@@ -284,7 +309,7 @@ public class MovableSpawner extends JavaPlugin {
 				
 			} );
 			
-			movableSpawnerNbt.setString( "spawned_type", spawnerType.get().identifier );
+			movableSpawnerNbt.setString( ENTITY_TYPE, entityType.get().identifier );
 			
 			return true;
 			
@@ -292,7 +317,7 @@ public class MovableSpawner extends JavaPlugin {
 		
 		ItemMeta spawnerItemMeta = spawnerItem.getItemMeta();
 		
-		spawnerItemMeta.setDisplayName( "§6" + spawnerType.get().name + "§r §espawner§r" );
+		spawnerItemMeta.setDisplayName( "§6" + entityType.get().name + "§r §espawner§r" );
 		spawnerItemMeta.setLore( spawnerItemLores );
 		
 		spawnerItem.setItemMeta( spawnerItemMeta );
@@ -317,7 +342,7 @@ public class MovableSpawner extends JavaPlugin {
 			
 			AtomicReference<EntitySpawnerType> spawnerType = new AtomicReference<>( EntitySpawnerType.UNKNOWN );
 			
-			NBTUtils.getNBTString( movableSpawnerNbt, "spawned_type", spawnedType -> {
+			NBTUtils.getNBTString( movableSpawnerNbt, ENTITY_TYPE, spawnedType -> {
 				
 				spawnerType.set( EntitySpawnerType.getEntitySpawnerType( spawnedType ) );
 				
@@ -338,22 +363,15 @@ public class MovableSpawner extends JavaPlugin {
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
 		
-		final Location loc = new Location( world, x, y, z );
 		Block block;
 		
-		for ( int offX = -MINIMUM_SPAWNER_SPACEMENT; offX <= MINIMUM_SPAWNER_SPACEMENT; offX++ ) {
-			for ( int offY = Math.max( -MINIMUM_SPAWNER_SPACEMENT, 0 - y ); offY <= Math.min( MINIMUM_SPAWNER_SPACEMENT, maxHeight - y ); offY++ ) {
-				for ( int offZ = -MINIMUM_SPAWNER_SPACEMENT; offZ <= MINIMUM_SPAWNER_SPACEMENT; offZ++ ) {
+		for ( int offX = -SPAWNER_ZONE_RADIUS_XZ; offX <= SPAWNER_ZONE_RADIUS_XZ; offX++ ) {
+			for ( int offY = Math.max( -SPAWNER_ZONE_RADIUS_Y, 0 - y ); offY <= Math.min( SPAWNER_ZONE_RADIUS_Y, maxHeight - y ); offY++ ) {
+				for ( int offZ = -SPAWNER_ZONE_RADIUS_XZ; offZ <= SPAWNER_ZONE_RADIUS_XZ; offZ++ ) {
 					
 					if ( offX == 0 && offY == 0 && offZ == 0 ) continue;
 					
-					loc.setX( x + offX );
-					loc.setY( y + offY );
-					loc.setZ( z + offZ );
-					
-					if ( loc.distance( location ) > MINIMUM_SPAWNER_SPACEMENT ) continue;
-					
-					block = world.getBlockAt( loc );
+					block = world.getBlockAt( x + offX, y + offY, z + offZ );
 					
 					if ( block.getType() == Material.MOB_SPAWNER ) return false;
 					
@@ -374,36 +392,36 @@ public class MovableSpawner extends JavaPlugin {
 				NBTTagCompound movableSpawnerNbt = spawnerItemNbt.getCompound( SPAWNER_ITEM_NBT_KEY );
 				if ( movableSpawnerNbt == null ) return false;
 				
-				NBTUtils.getNBTShort( movableSpawnerNbt, "max_nearby_entities", maxNearbyEntities -> {
-					spawnerBlockNbt.setShort( "MaxNearbyEntities", maxNearbyEntities );
+				NBTUtils.getNBTShort( movableSpawnerNbt, MAX_NEARBY_ENTITY_MS, maxNearbyEntities -> {
+					spawnerBlockNbt.setShort( MAX_NEARBY_ENTITY_RAW, maxNearbyEntities );
 				} );
 				
-				NBTUtils.getNBTShort( movableSpawnerNbt, "required_player_range", requiredPlayerRange -> {
-					spawnerBlockNbt.setShort( "RequiredPlayerRange", requiredPlayerRange );
+				NBTUtils.getNBTShort( movableSpawnerNbt, REQUIRED_PLAYER_RANGE_MS, requiredPlayerRange -> {
+					spawnerBlockNbt.setShort( REQUIRED_PLAYER_RANGE_RAW, requiredPlayerRange );
 				} );
 				
-				NBTUtils.getNBTShort( movableSpawnerNbt, "spawn_count", spawnCount -> {
-					spawnerBlockNbt.setShort( "SpawnCount", spawnCount );
+				NBTUtils.getNBTShort( movableSpawnerNbt, SPAWN_COUNT_MS, spawnCount -> {
+					spawnerBlockNbt.setShort( SPAWN_COUNT_RAW, spawnCount );
 				} );
 				
-				NBTUtils.getNBTShort( movableSpawnerNbt, "min_spawn_delay", minSpawnDelay -> {
-					spawnerBlockNbt.setShort( "MinSpawnDelay", minSpawnDelay );
+				NBTUtils.getNBTShort( movableSpawnerNbt, MIN_SPAWN_DELAY_MS, minSpawnDelay -> {
+					spawnerBlockNbt.setShort( MIN_SPAWN_DELAY_RAW, minSpawnDelay );
 				} );
 				
-				NBTUtils.getNBTShort( movableSpawnerNbt, "max_spawn_delay", maxSpawnDelay -> {
-					spawnerBlockNbt.setShort( "MaxSpawnDelay", maxSpawnDelay );
+				NBTUtils.getNBTShort( movableSpawnerNbt, MAX_SPAWN_DELAY_MS, maxSpawnDelay -> {
+					spawnerBlockNbt.setShort( MAX_SPAWN_DELAY_RAW, maxSpawnDelay );
 				} );
 				
-				NBTUtils.getNBTShort( movableSpawnerNbt, "spawn_range", spawnRange -> {
-					spawnerBlockNbt.setShort( "SpawnRange", spawnRange );
+				NBTUtils.getNBTShort( movableSpawnerNbt, SPAWN_RANGE_MS, spawnRange -> {
+					spawnerBlockNbt.setShort( SPAWN_RANGE_RAW, spawnRange );
 				} );
 				
-				NBTUtils.getNBTCompound( movableSpawnerNbt, "spawn_data", spawnData -> {
-					spawnerBlockNbt.set( "SpawnData", spawnData );
+				NBTUtils.getNBTCompound( movableSpawnerNbt, SPAWN_DATA_MS, spawnData -> {
+					spawnerBlockNbt.set( SPAWN_DATA_RAW, spawnData );
 				} );
 				
-				NBTUtils.getNBTList( movableSpawnerNbt, "spawn_potentials", spawnPotentials -> {
-					spawnerBlockNbt.set( "SpawnPotentials", spawnPotentials );
+				NBTUtils.getNBTList( movableSpawnerNbt, SPAWN_POTENTIALS_MS, spawnPotentials -> {
+					spawnerBlockNbt.set( SPAWN_POTENTIALS_RAW, spawnPotentials );
 				} );
 				
 				return true;

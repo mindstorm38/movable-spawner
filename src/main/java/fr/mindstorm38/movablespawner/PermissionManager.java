@@ -19,7 +19,7 @@ public class PermissionManager {
 		if ( sender.isOp() ) return true;
 		if ( sender.hasPermission( PERSMISSION_ALL ) ) return true;
 		boolean perm = sender.hasPermission( permission );
-		if ( message && !perm ) sender.sendMessage( "§cMissing permission '§r§e" + permission + "§r§c'§r" );
+		if ( message && !perm ) sender.sendMessage( "§cIl vous manque la permission '§r§e" + permission + "§r§c'§r" );
 		return perm;
 		
 	}
