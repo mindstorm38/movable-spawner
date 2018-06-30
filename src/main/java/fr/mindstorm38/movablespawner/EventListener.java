@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,13 +26,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.TrapDoor;
-
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import net.minecraft.server.v1_12_R1.NBTBase;
+
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
-import net.minecraft.server.v1_12_R1.NBTTagShort;
-import net.minecraft.server.v1_12_R1.TileEntity;
 
 public class EventListener implements Listener {
 
@@ -125,7 +120,7 @@ public class EventListener implements Listener {
 				
 				CreatureSpawner spawnerBlockState = (CreatureSpawner) spawnerBlock.getState();
 				
-				NBTTagCompound spawnerNbt = getTileEntityNBT( spawnerBlockState );
+				NBTTagCompound spawnerNbt = NBTUtils.getTileEntityNBT( spawnerBlockState );
 				
 				net.minecraft.server.v1_12_R1.ItemStack stackRaw = CraftItemStack.asNMSCopy( new ItemStack( Material.MOB_SPAWNER ) );
 				
@@ -137,55 +132,55 @@ public class EventListener implements Listener {
 				
 				List<String> stackLores = new ArrayList<>();
 				
-				getNBTShort( spawnerNbt, "MaxNearbyEntities", maxNearbyEntities -> {
+				NBTUtils.getNBTShort( spawnerNbt, "MaxNearbyEntities", maxNearbyEntities -> {
 					
 					stackMovableSpawnerNbt.setShort( "max_nearby_entities", maxNearbyEntities );
 					stackLores.add( "§aMax nearby entities :§r §e" + maxNearbyEntities + "§r" );
 					
 				} );
 				
-				getNBTShort( spawnerNbt, "RequiredPlayerRange", requiredPlayerRange -> {
+				NBTUtils.getNBTShort( spawnerNbt, "RequiredPlayerRange", requiredPlayerRange -> {
 					
 					stackMovableSpawnerNbt.setShort( "required_player_range", requiredPlayerRange );
 					stackLores.add( "§aRequired player range :§r §e" + requiredPlayerRange + "§r" );
 					
 				} );
 				
-				getNBTShort( spawnerNbt, "SpawnCount", spawnCount -> {
+				NBTUtils.getNBTShort( spawnerNbt, "SpawnCount", spawnCount -> {
 					
 					stackMovableSpawnerNbt.setShort( "spawn_count", spawnCount );
 					stackLores.add( "§aSpawn count :§r §e" + spawnCount + "§r" );
 					
 				} );
 				
-				getNBTShort( spawnerNbt, "MinSpawnDelay", minSpawnDelay -> {
+				NBTUtils.getNBTShort( spawnerNbt, "MinSpawnDelay", minSpawnDelay -> {
 					
 					stackMovableSpawnerNbt.setShort( "min_spawn_delay", minSpawnDelay );
 					stackLores.add( "§aMin spawn delay :§r §e" + minSpawnDelay + "§r" );
 					
 				} );
 				
-				getNBTShort( spawnerNbt, "MaxSpawnDelay", maxSpawnDelay -> {
+				NBTUtils.getNBTShort( spawnerNbt, "MaxSpawnDelay", maxSpawnDelay -> {
 					
 					stackMovableSpawnerNbt.setShort( "max_spawn_delay", maxSpawnDelay );
 					stackLores.add( "§aMax spawn delay :§r §e" + maxSpawnDelay + "§r" );
 					
 				} );
 				
-				getNBTShort( spawnerNbt, "SpawnRange", spawnRange -> {
+				NBTUtils.getNBTShort( spawnerNbt, "SpawnRange", spawnRange -> {
 					
 					stackMovableSpawnerNbt.setShort( "spawn_range", spawnRange );
 					stackLores.add( "§aSpawn range :§r §e" + spawnRange + "§r" );
 					
 				} );
 				
-				getNBTBase( spawnerNbt, "SpawnData", spawnData -> {
+				NBTUtils.getNBTBase( spawnerNbt, "SpawnData", spawnData -> {
 					
 					stackMovableSpawnerNbt.set( "spawn_data", spawnData );
 					
 				} );
 				
-				getNBTBase( spawnerNbt, "SpawnPotentials", spawnPotentials -> {
+				NBTUtils.getNBTBase( spawnerNbt, "SpawnPotentials", spawnPotentials -> {
 					
 					stackMovableSpawnerNbt.set( "spawn_potentials", spawnPotentials );
 					
@@ -241,57 +236,57 @@ public class EventListener implements Listener {
 		
 		CreatureSpawner spawnerBlockState = (CreatureSpawner) spawnerBlock.getState();
 		
-		NBTTagCompound spawnerNbt = getTileEntityNBT( spawnerBlockState );
+		NBTTagCompound spawnerNbt = NBTUtils.getTileEntityNBT( spawnerBlockState );
 		
-		getNBTShort( stackMovableSpawnerNbt, "max_nearby_entities", maxNearbyEntities -> {
+		NBTUtils.getNBTShort( stackMovableSpawnerNbt, "max_nearby_entities", maxNearbyEntities -> {
 			
 			spawnerNbt.setShort( "MaxNearbyEntities", maxNearbyEntities );
 			
 		} );
 		
-		getNBTShort( stackMovableSpawnerNbt, "required_player_range", requiredPlayerRange -> {
+		NBTUtils.getNBTShort( stackMovableSpawnerNbt, "required_player_range", requiredPlayerRange -> {
 			
 			spawnerNbt.setShort( "RequiredPlayerRange", requiredPlayerRange );
 			
 		} );
 		
-		getNBTShort( stackMovableSpawnerNbt, "spawn_count", spawnCount -> {
+		NBTUtils.getNBTShort( stackMovableSpawnerNbt, "spawn_count", spawnCount -> {
 			
 			spawnerNbt.setShort( "SpawnCount", spawnCount );
 			
 		} );
 		
-		getNBTShort( stackMovableSpawnerNbt, "min_spawn_delay", minSpawnDelay -> {
+		NBTUtils.getNBTShort( stackMovableSpawnerNbt, "min_spawn_delay", minSpawnDelay -> {
 			
 			spawnerNbt.setShort( "MinSpawnDelay", minSpawnDelay );
 			
 		} );
 		
-		getNBTShort( stackMovableSpawnerNbt, "max_spawn_delay", maxSpawnDelay -> {
+		NBTUtils.getNBTShort( stackMovableSpawnerNbt, "max_spawn_delay", maxSpawnDelay -> {
 			
 			spawnerNbt.setShort( "MaxSpawnDelay", maxSpawnDelay );
 			
 		} );
 		
-		getNBTShort( stackMovableSpawnerNbt, "spawn_range", spawnRange -> {
+		NBTUtils.getNBTShort( stackMovableSpawnerNbt, "spawn_range", spawnRange -> {
 			
 			spawnerNbt.setShort( "SpawnRange", spawnRange );
 			
 		} );
 		
-		getNBTBase( stackMovableSpawnerNbt, "spawn_data", spawnData -> {
+		NBTUtils.getNBTBase( stackMovableSpawnerNbt, "spawn_data", spawnData -> {
 			
 			spawnerNbt.set( "SpawnData", spawnData );
 			
 		} );
 		
-		getNBTBase( stackMovableSpawnerNbt, "spawn_potentials", spawnPotentials -> {
+		NBTUtils.getNBTBase( stackMovableSpawnerNbt, "spawn_potentials", spawnPotentials -> {
 			
 			spawnerNbt.set( "SpawnPotentials", spawnPotentials );
 			
 		} );
 		
-		setTileEntityNBT( spawnerBlockState, spawnerNbt );
+		NBTUtils.setTileEntityNBT( spawnerBlockState, spawnerNbt );
 		
 		// Don't update Bukkit BlockState because that re-update NMS entity with its non-updated datas
 		
@@ -399,51 +394,6 @@ public class EventListener implements Listener {
 			blockSpawner.getRelative( face ).setType( Material.AIR );
 		
 		blockSpawner.setType( Material.AIR );
-		
-	}
-	
-	// NBTUtils \\
-	
-	public static void getNBTShort(NBTTagCompound compound, String identifier, Consumer<Short> consumer) {
-		NBTBase base = compound.get( identifier );
-		if ( base == null || !( base instanceof NBTTagShort ) ) return;
-		consumer.accept( ( (NBTTagShort) base ).f() );
-	}
-	
-	public static void getNBTBase(NBTTagCompound compound, String identifier, Consumer<NBTBase> consumer) {
-		NBTBase base = compound.get( identifier );
-		if ( base == null ) return;
-		consumer.accept( base );
-	}
-	
-	public static void getNBTCompound(NBTTagCompound compound, String identifier, Consumer<NBTTagCompound> consumer) {
-		NBTBase base = compound.get( identifier );
-		if ( base == null || !( base instanceof NBTTagCompound ) ) return;
-		consumer.accept( ( (NBTTagCompound) base ).g() );
-	}
-	
-	public static NBTTagCompound getTileEntityNBT(BlockState state) {
-		
-		Location location = state.getLocation();
-		CraftWorld worldRaw = (CraftWorld) location.getWorld();
-		
-		TileEntity tileEntity = worldRaw.getTileEntityAt( location.getBlockX(), location.getBlockY(), location.getBlockZ() );
-		
-		NBTTagCompound compound = new NBTTagCompound();
-		tileEntity.save( compound );
-		return compound;
-		
-	}
-	
-	public static void setTileEntityNBT(BlockState state, NBTTagCompound nbt) {
-		
-		Location location = state.getLocation();
-		CraftWorld worldRaw = (CraftWorld) location.getWorld();
-		
-		TileEntity tileEntity = worldRaw.getTileEntityAt( location.getBlockX(), location.getBlockY(), location.getBlockZ() );
-		
-		tileEntity.load( nbt );
-		tileEntity.update();
 		
 	}
 	
