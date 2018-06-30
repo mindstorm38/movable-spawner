@@ -14,7 +14,7 @@ public enum EntitySpawnerType {
 	BOAT				( EntityType.BOAT,					"Boat",					"minecraft:boat"					),
 	CAVE_SPIDER			( EntityType.CAVE_SPIDER,			"Cave Spider",			"minecraft:cave_spider",			Environment.NORMAL ),
 	CHICKEN				( EntityType.CHICKEN,				"Chicken",				"minecraft:chicken",				Environment.NORMAL ),
-	COMPLEX_PART		( EntityType.COMPLEX_PART,			"Complex Part",			null								),
+	COMPLEX_PART		( EntityType.COMPLEX_PART,			"Complex Part (?!)",	null								),
 	COW					( EntityType.COW,					"Cow",					"minecraft:cow",					Environment.NORMAL ),
 	CREEPER				( EntityType.CREEPER,				"Creeper",				"minecraft:creeper",				Environment.NORMAL ),
 	DONKEY				( EntityType.DONKEY,				"Donkey",				"minecraft:donkey",					Environment.NORMAL ),
