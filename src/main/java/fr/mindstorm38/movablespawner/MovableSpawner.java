@@ -14,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -33,8 +34,6 @@ public class MovableSpawner extends JavaPlugin {
 	
 	public static final int SPAWNER_ZONE_SIZE_XZ			= SPAWNER_ZONE_RADIUS_XZ * 2 + 1;
 	public static final int SPAWNER_ZONE_SIZE_Y				= SPAWNER_ZONE_RADIUS_Y * 2 + 1;
-	
-	// - NBT Constants
 	
 	public static final String SPAWNER_TOOL_KEY				= "movable_spawner_tool";
 	
@@ -56,6 +55,10 @@ public class MovableSpawner extends JavaPlugin {
 	public static final String SPAWN_POTENTIALS_MS			= "spawn_potentials";
 	public static final String SPAWN_POTENTIALS_RAW			= "SpawnPotentials";
 	public static final String ENTITY_TYPE					= "entity_type";
+	
+	public static final float RARE_RECORD_CHANCE			= 0.2f;
+	
+	public static final int SPAWNER_ANIMATION_CLEAR_ZONE	= 1;
 	
 	// Class \\
 	
@@ -117,7 +120,7 @@ public class MovableSpawner extends JavaPlugin {
 		
 		if ( this.toolItem == null ) {
 			
-			this.toolItem = NBTUtils.editItemStackNBT( new ItemStack( Material.RECORD_5 ), nbt -> {
+			this.toolItem = NBTUtils.editItemStackNBT( new ItemStack( Material.RECORD_8 ), nbt -> {
 				
 				nbt.setBoolean( SPAWNER_TOOL_KEY, true );
 				return true;
@@ -128,7 +131,7 @@ public class MovableSpawner extends JavaPlugin {
 			
 			itemMeta.setDisplayName("§6Spawner tool§r");
 			itemMeta.addItemFlags( ItemFlag.values() );
-			itemMeta.addEnchant( Enchantment.LUCK, 1, true );
+			itemMeta.addEnchant( Enchantment.LUCK, 0, true );
 			
 			this.toolItem.setItemMeta( itemMeta );
 			
@@ -150,16 +153,17 @@ public class MovableSpawner extends JavaPlugin {
 		
 	}
 	
-	public boolean canBreakSpawner(Location loc) {
-		for ( SpawnerDestroyingRunnable runnable : this.spawnerDestroyingRunnables )
-			if ( runnable.spawnerLocation.equals( loc ) )
-				return false;
-		return true;
+	public boolean canPlayerBreakBlock(Block block, Player player) {
+		
+		MovableSpawnerBlockBreakEvent checker = new MovableSpawnerBlockBreakEvent( block, player );
+		this.pluginManager.callEvent( checker );
+		return !checker.isCancelled();
+		
 	}
 	
 	public void removeOneTool(PlayerInventory inv, boolean usedMainHandItem) {
 		
-		boolean giveRareRecord = this.random.nextFloat() <= 0.1f;
+		boolean giveRareRecord = this.random.nextFloat() <= RARE_RECORD_CHANCE;
 		ItemStack rareRecordItem = new ItemStack( Material.RECORD_11 );
 		
 		ItemStack mainHandItem = inv.getItemInMainHand();
@@ -203,10 +207,46 @@ public class MovableSpawner extends JavaPlugin {
 		
 	}
 	
-	public void breakSpawner(CreatureSpawner spawnerBlockState) {
+	public boolean canBreakBlock(Location loc) {
 		
-		Location spawnerLocation = spawnerBlockState.getLocation();
-		if ( !this.canBreakSpawner( spawnerLocation ) ) return;
+		for ( SpawnerDestroyingRunnable runnable : this.spawnerDestroyingRunnables )
+			if ( runnable.spawnerLocation.equals( loc ) )
+				return false;
+		
+		return true;
+		
+	}
+	
+	public boolean canBreakSpawner(Location loc, Player player) {
+		
+		World world = loc.getWorld();
+		int x = loc.getBlockX();
+		int y = loc.getBlockY();
+		int z = loc.getBlockZ();
+		
+		Block block;
+		
+		for ( int offX = -MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offX <= MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offX++ ) {
+			for ( int offY = -MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offY <= MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offY++ ) {
+				for ( int offZ = -MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offZ <= MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offZ++ ) {
+					
+					if ( offX == 0 && offY == 0 && offZ == 0 ) continue;
+					
+					block = world.getBlockAt( x + offX, y + offY, z + offZ );
+					
+					if ( block.getType() == Material.AIR ) continue;
+					
+					if ( !this.canPlayerBreakBlock( block, player ) ) return false;
+					
+				}
+			}
+		}
+		
+		return true;
+		
+	}
+	
+	public void breakSpawner(CreatureSpawner spawnerBlockState) {
 		
 		final List<String> spawnerItemLores = new ArrayList<>();
 		
@@ -319,6 +359,8 @@ public class MovableSpawner extends JavaPlugin {
 		
 		spawnerItemMeta.setDisplayName( "§6" + entityType.get().name + "§r §espawner§r" );
 		spawnerItemMeta.setLore( spawnerItemLores );
+		spawnerItemMeta.addItemFlags( ItemFlag.values() );
+		spawnerItemMeta.addEnchant( Enchantment.LUCK, 0, true );
 		
 		spawnerItem.setItemMeta( spawnerItemMeta );
 		

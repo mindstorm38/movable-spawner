@@ -10,3 +10,4 @@ gradlew.bat
 /server/
 builder.xml
 /.externalToolBuilders
+/build/

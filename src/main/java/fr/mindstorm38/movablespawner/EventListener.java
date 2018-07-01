@@ -36,16 +36,17 @@ public class EventListener implements Listener {
 		
 	}
 	
-	@EventHandler( priority = EventPriority.LOW )
+	@EventHandler( priority = EventPriority.HIGHEST )
 	public void blockBreakEvent(BlockBreakEvent e) {
 		
 		if ( e.isCancelled() ) return;
+		if ( e instanceof MovableSpawnerBlockBreakEvent ) return;
 		
 		Block block = e.getBlock();
 		
 		if ( block.getType() == Material.MOB_SPAWNER ) {
 			
-			boolean canBreak = this.plugin.canBreakSpawner( block.getLocation() );
+			boolean canBreak = this.plugin.canBreakBlock( block.getLocation() );
 			
 			if ( canBreak ) {
 				
@@ -63,12 +64,20 @@ public class EventListener implements Listener {
 						
 						if ( validToolItem ) {
 							
-							e.setCancelled( true );
-							
-							if ( PermissionManager.hasPermission( player, PermissionManager.PERMISSION_USE ) ) {
+							if ( this.plugin.canBreakSpawner( block.getLocation(), player ) ) {
 								
-								this.plugin.breakSpawner( (CreatureSpawner) block.getState() );
-								if ( player.getGameMode() != GameMode.CREATIVE ) this.plugin.removeOneTool( playerInv, true );
+								e.setCancelled( true );
+								
+								if ( PermissionManager.hasPermission( player, PermissionManager.PERMISSION_USE ) ) {
+									
+									this.plugin.breakSpawner( (CreatureSpawner) block.getState() );
+									if ( player.getGameMode() != GameMode.CREATIVE ) this.plugin.removeOneTool( playerInv, true );
+									
+								}
+							
+							} else {
+								
+								player.sendMessage( "§cCertains blocs autour du spawner sont protégé§r" );
 								
 							}
 							
@@ -88,8 +97,10 @@ public class EventListener implements Listener {
 		
 	}
 	
-	@EventHandler
+	@EventHandler( priority = EventPriority.HIGHEST )
 	public void blockPlaceEvent(BlockPlaceEvent e) {
+		
+		if ( e.isCancelled() ) return;
 		
 		Block spawnerBlock = e.getBlockPlaced();
 		
@@ -131,8 +142,6 @@ public class EventListener implements Listener {
 						player.sendMessage( "§cLe type d'entitée contenue dans ce spawner est incompatible avec la dimension du monde actuel§r" );
 						
 					}
-					
-					
 					
 				}
 				

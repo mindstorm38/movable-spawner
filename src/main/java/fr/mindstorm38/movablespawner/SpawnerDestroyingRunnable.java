@@ -1,7 +1,5 @@
 package fr.mindstorm38.movablespawner;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -85,21 +83,15 @@ public class SpawnerDestroyingRunnable implements Runnable {
 		
 		int maxHeight = this.world.getMaxHeight();
 		
-		AtomicBoolean update = new AtomicBoolean( false );
-		
-		for ( int offX = -1; offX <= 1; offX++ ) {
-			for ( int offY = -1; offY <= 1; offY++ ) {
-				for ( int offZ = -1; offZ <= 1; offZ++ ) {
+		for ( int offX = -MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offX <= MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offX++ ) {
+			for ( int offY = Math.max( -MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE, 0 - this.y ) ; offY <= Math.min( MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE, maxHeight - this.y ); offY++ ) {
+				for ( int offZ = -MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offZ <= MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offZ++ ) {
 					
 					if ( offX == 0 && offY == 0 && offZ == 0 ) continue;
 					
-					final int locY = this.y + offY;
-					if ( locY < 0 || locY > maxHeight ) continue;
-					
 					final int locX = this.x + offX;
+					final int locY = this.y + offY;
 					final int locZ = this.z + offZ;
-					
-					update.set( false );
 					
 					this.plugin.runSync( () -> {
 						
@@ -107,12 +99,11 @@ public class SpawnerDestroyingRunnable implements Runnable {
 						
 						if ( block.isEmpty() ) return;
 						
-						update.set( true );
 						block.breakNaturally();
 						
 					} );
 					
-					if ( update.get() ) safesleep( 100L );
+					safesleep( 100L );
 					
 				}
 			}
