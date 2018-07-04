@@ -75,12 +75,6 @@ public class SpawnerDestroyingRunnable implements Runnable {
 	@Override
 	public void run() {
 		
-		this.plugin.runSync( () -> {
-			
-			this.world.playSound( this.spawnerLocation, Sound.BLOCK_END_PORTAL_SPAWN, 1.0f, 0.5f );
-			
-		} );
-		
 		int maxHeight = this.world.getMaxHeight();
 		
 		for ( int offX = -MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offX <= MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offX++ ) {
@@ -96,18 +90,20 @@ public class SpawnerDestroyingRunnable implements Runnable {
 					this.plugin.runSync( () -> {
 						
 						Block block = this.world.getBlockAt( locX, locY, locZ );
-						
 						if ( block.isEmpty() ) return;
-						
 						block.breakNaturally();
 						
 					} );
 					
-					safesleep( 100L );
-					
 				}
 			}
 		}
+		
+		this.plugin.runSync( () -> {
+			
+			this.world.spawnParticle( Particle.FLAME, this.centerLocation, 100, 0.5, 0.5, 0.5, 0.01 );
+			
+		} );
 		
 		safesleep( 600L );
 		
@@ -130,6 +126,12 @@ public class SpawnerDestroyingRunnable implements Runnable {
 		this.plugin.runSync( () -> {
 			
 			this.world.strikeLightningEffect( this.spawnerLocation.clone().add( 0f, 1f, 0f ) );
+			
+		} );
+		
+		this.plugin.runSync( () -> {
+			
+			this.world.playSound( this.centerLocation, Sound.BLOCK_FIRE_AMBIENT, 1.0f, 0.5f );
 			
 		} );
 		
@@ -161,7 +163,7 @@ public class SpawnerDestroyingRunnable implements Runnable {
 			this.world.getBlockAt( this.spawnerLocation ).setType( Material.AIR );
 			
 			this.world.spawnParticle( Particle.CRIT, this.centerLocation, 10 );
-			this.world.playSound( this.spawnerLocation, Sound.BLOCK_METAL_BREAK, 1.0f, 1.0f );
+			this.world.playSound( this.centerLocation, Sound.BLOCK_METAL_BREAK, 1.0f, 1.0f );
 			
 		} );
 		
@@ -174,7 +176,7 @@ public class SpawnerDestroyingRunnable implements Runnable {
 			item.setVelocity( new Vector( 0f, 0f, 0f ) );
 			
 			this.world.spawnParticle( Particle.PORTAL, this.centerLocation.clone().add( 0f, 0.3f, 0f ), 100 );
-			this.world.playSound( this.spawnerLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 0.5f );
+			this.world.playSound( this.centerLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 5.0f, 0.5f );
 			
 		} );
 		
@@ -219,7 +221,7 @@ public class SpawnerDestroyingRunnable implements Runnable {
 			blockState.setData( trapdoor );
 			blockState.update();
 			
-			this.world.playSound( this.spawnerLocation, Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.0f, 1.0f );
+			this.world.playSound( this.centerLocation, Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.0f, 1.0f );
 			
 		} );
 		

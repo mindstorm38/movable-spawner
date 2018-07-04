@@ -1,6 +1,7 @@
 package fr.mindstorm38.movablespawner;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -43,56 +44,50 @@ public class EventListener implements Listener {
 		if ( e instanceof MovableSpawnerBlockBreakEvent ) return;
 		
 		Block block = e.getBlock();
+		Location blockLocation = block.getLocation();
+		
+		if ( !this.plugin.canInterractAt( blockLocation ) ) {
+			
+			e.setCancelled( true );
+			return;
+			
+		}
 		
 		if ( block.getType() == Material.MOB_SPAWNER ) {
 			
-			boolean canBreak = this.plugin.canBreakBlock( block.getLocation() );
+			Player player = e.getPlayer();
 			
-			if ( canBreak ) {
+			if ( player != null ) {
 				
-				Player player = e.getPlayer();
+				PlayerInventory playerInv = player.getInventory();
 				
-				if ( player != null ) {
+				ItemStack mainHandItem = playerInv.getItemInMainHand();
+				
+				if ( mainHandItem != null && mainHandItem.getType() != Material.AIR ) {
 					
-					PlayerInventory playerInv = player.getInventory();
+					boolean validToolItem = this.plugin.isValidToolItem( mainHandItem );
 					
-					ItemStack mainHandItem = playerInv.getItemInMainHand();
-					
-					if ( mainHandItem != null && mainHandItem.getType() != Material.AIR ) {
+					if ( validToolItem ) {
 						
-						boolean validToolItem = this.plugin.isValidToolItem( mainHandItem );
+						e.setCancelled( true );
 						
-						if ( validToolItem ) {
+						if ( this.plugin.canBreakSpawner( blockLocation, player ) ) {
 							
-							if ( this.plugin.canBreakSpawner( block.getLocation(), player ) ) {
+							if ( PermissionManager.hasPermission( player, PermissionManager.PERMISSION_USE ) ) {
 								
-								e.setCancelled( true );
-								
-								if ( PermissionManager.hasPermission( player, PermissionManager.PERMISSION_USE ) ) {
-									
-									this.plugin.breakSpawner( (CreatureSpawner) block.getState() );
-									if ( player.getGameMode() != GameMode.CREATIVE ) this.plugin.removeOneTool( playerInv, true );
-									
-								}
-							
-							} else {
-								
-								player.sendMessage( "§cCertains blocs autour du spawner sont protégé§r" );
+								this.plugin.breakSpawner( (CreatureSpawner) block.getState() );
+								if ( player.getGameMode() != GameMode.CREATIVE ) this.plugin.removeOneTool( playerInv, true );
 								
 							}
-							
+						
 						}
 						
 					}
 					
 				}
 				
-			} else {
-				
-				e.setCancelled( true );
-				
 			}
-			
+				
 		}
 		
 	}
@@ -103,6 +98,13 @@ public class EventListener implements Listener {
 		if ( e.isCancelled() ) return;
 		
 		Block spawnerBlock = e.getBlockPlaced();
+		
+		if ( !this.plugin.canInterractAt( spawnerBlock.getLocation() ) ) {
+			
+			e.setCancelled( true );
+			return;
+			
+		}
 		
 		if ( spawnerBlock.getType() == Material.MOB_SPAWNER ) {
 			
@@ -131,7 +133,7 @@ public class EventListener implements Listener {
 							e.setCancelled( true );
 							player.sendMessage( new String[] {
 									"§cVous spawner est trop proche des autre spawners§r",
-									"§c  Il est impossible de poser des spawners dans une zone carrée de§r §e" + MovableSpawner.SPAWNER_ZONE_SIZE_XZ + "x" + MovableSpawner.SPAWNER_ZONE_SIZE_Y + "x" + MovableSpawner.SPAWNER_ZONE_SIZE_XZ + "§r §ccentré sur le spawner§r"
+									"§c  Il est impossible de poser des spawners dans une zone carrée de§r §e" + MovableSpawner.SPAWNER_ZONE_SIZE_XZ + "x" + MovableSpawner.SPAWNER_ZONE_SIZE_Y + "x" + MovableSpawner.SPAWNER_ZONE_SIZE_XZ + " (X/Y/Z)§r §ccentré sur le spawner§r"
 							} );
 							
 						}

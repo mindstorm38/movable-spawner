@@ -1,7 +1,9 @@
 package fr.mindstorm38.movablespawner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,6 +24,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 
@@ -65,7 +68,7 @@ public class MovableSpawner extends JavaPlugin {
 	private final EventListener eventListener;
 	private final CommandListener commandListener;
 	
-	private final List<SpawnerDestroyingRunnable> spawnerDestroyingRunnables;
+	private final Map<SpawnerDestroyingRunnable, BukkitTask> spawnerDestroyingTasks;
 	private final Random random;
 	
 	private ItemStack toolItem;
@@ -77,7 +80,7 @@ public class MovableSpawner extends JavaPlugin {
 		this.eventListener = new EventListener( this );
 		this.commandListener = new CommandListener( this );
 		
-		this.spawnerDestroyingRunnables = new ArrayList<>();
+		this.spawnerDestroyingTasks = new HashMap<>();
 		this.random = new Random();
 		
 		this.getToolItem();
@@ -106,10 +109,16 @@ public class MovableSpawner extends JavaPlugin {
 		this.eventListener.stop();
 		this.commandListener.stop();
 		
+		this.spawnerDestroyingTasks.clear();
+		this.scheduler.cancelTasks( this );
+		
 	}
 	
 	public void runSync(Runnable run) {
+		
+		if ( !this.isEnabled() ) return;
 		this.scheduler.runTask( this, run );
+		
 	}
 	
 	public PluginManager getPluginManager() {
@@ -207,11 +216,23 @@ public class MovableSpawner extends JavaPlugin {
 		
 	}
 	
-	public boolean canBreakBlock(Location loc) {
+	public boolean canInterractAt(Location loc) {
 		
-		for ( SpawnerDestroyingRunnable runnable : this.spawnerDestroyingRunnables )
-			if ( runnable.spawnerLocation.equals( loc ) )
-				return false;
+		int x = loc.getBlockX();
+		int y = loc.getBlockY();
+		int z = loc.getBlockZ();
+		
+		for ( SpawnerDestroyingRunnable runnable : this.spawnerDestroyingTasks.keySet() ) {
+			
+			int locX = runnable.spawnerLocation.getBlockX();
+			int locY = runnable.spawnerLocation.getBlockY();
+			int locZ = runnable.spawnerLocation.getBlockZ();
+			
+			if ( x >= ( locX - SPAWNER_ANIMATION_CLEAR_ZONE ) || x <= ( locX + SPAWNER_ANIMATION_CLEAR_ZONE ) ) return false;
+			if ( y >= ( locY - SPAWNER_ANIMATION_CLEAR_ZONE ) || y <= ( locY + SPAWNER_ANIMATION_CLEAR_ZONE ) ) return false;
+			if ( z >= ( locZ - SPAWNER_ANIMATION_CLEAR_ZONE ) || z <= ( locZ + SPAWNER_ANIMATION_CLEAR_ZONE ) ) return false;
+			
+		}
 		
 		return true;
 		
@@ -365,8 +386,8 @@ public class MovableSpawner extends JavaPlugin {
 		spawnerItem.setItemMeta( spawnerItemMeta );
 		
 		SpawnerDestroyingRunnable runnable = new SpawnerDestroyingRunnable( this, spawnerBlockState, spawnerItem );
-		this.scheduler.runTaskAsynchronously( this, runnable );
-		this.spawnerDestroyingRunnables.add( runnable );
+		BukkitTask task = this.scheduler.runTaskAsynchronously( this, runnable );
+		this.spawnerDestroyingTasks.put( runnable, task );
 		
 	}
 	
@@ -481,7 +502,10 @@ public class MovableSpawner extends JavaPlugin {
 	}
 	
 	public void removeSpawnerDestroyingRunnable(SpawnerDestroyingRunnable runnable) {
-		this.spawnerDestroyingRunnables.remove( runnable );
+		
+		BukkitTask task = this.spawnerDestroyingTasks.remove( runnable );
+		if ( task != null ) task.cancel();
+		
 	}
 	
 }
