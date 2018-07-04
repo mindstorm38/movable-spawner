@@ -55,7 +55,7 @@ public class CommandListener implements CommandExecutor {
 				
 			} else {
 				
-				sender.sendMessage("§cYou must be a player§r");
+				sender.sendMessage("§cVous devez êtes un joueur pour executer cette commande§r");
 				
 			}
 			
