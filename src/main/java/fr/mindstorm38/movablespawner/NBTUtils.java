@@ -6,17 +6,17 @@ import java.util.function.Function;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 
-import net.minecraft.server.v1_12_R1.ItemStack;
-import net.minecraft.server.v1_12_R1.NBTBase;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
-import net.minecraft.server.v1_12_R1.NBTTagInt;
-import net.minecraft.server.v1_12_R1.NBTTagList;
-import net.minecraft.server.v1_12_R1.NBTTagShort;
-import net.minecraft.server.v1_12_R1.NBTTagString;
-import net.minecraft.server.v1_12_R1.TileEntity;
+import net.minecraft.server.v1_13_R1.ItemStack;
+import net.minecraft.server.v1_13_R1.NBTBase;
+import net.minecraft.server.v1_13_R1.NBTTagCompound;
+import net.minecraft.server.v1_13_R1.NBTTagInt;
+import net.minecraft.server.v1_13_R1.NBTTagList;
+import net.minecraft.server.v1_13_R1.NBTTagShort;
+import net.minecraft.server.v1_13_R1.NBTTagString;
+import net.minecraft.server.v1_13_R1.TileEntity;
 
 public class NBTUtils {
 
@@ -35,7 +35,7 @@ public class NBTUtils {
 	public static void getNBTString(NBTTagCompound compound, String identifier, Consumer<String> consumer) {
 		NBTBase base = compound.get( identifier );
 		if ( base == null || !( base instanceof NBTTagString ) ) return;
-		consumer.accept( ( (NBTTagString) base ).c_() );
+		consumer.accept( ( (NBTTagString) base ).b_() );
 	}
 	
 	public static void getNBTBase(NBTTagCompound compound, String identifier, Consumer<NBTBase> consumer) {
@@ -47,13 +47,13 @@ public class NBTUtils {
 	public static void getNBTCompound(NBTTagCompound compound, String identifier, Consumer<NBTTagCompound> consumer) {
 		NBTBase base = compound.get( identifier );
 		if ( base == null || !( base instanceof NBTTagCompound ) ) return;
-		consumer.accept( ( (NBTTagCompound) base ).g() );
+		consumer.accept( ( (NBTTagCompound) base ) );
 	}
 	
 	public static void getNBTList(NBTTagCompound compound, String identifier, Consumer<NBTTagList> consumer) {
 		NBTBase base = compound.get( identifier );
 		if ( base == null || !( base instanceof NBTTagList ) ) return;
-		consumer.accept( ( (NBTTagList) base ).d() );
+		consumer.accept( ( (NBTTagList) base ) );
 	}
 	
 	public static NBTTagCompound getTileEntityNBT(BlockState state) {
