@@ -27,7 +27,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
+import net.minecraft.server.v1_13_R1.NBTTagCompound;
 
 public class MovableSpawner extends JavaPlugin {
 	
@@ -280,7 +280,7 @@ public class MovableSpawner extends JavaPlugin {
 		AtomicReference<EntitySpawnerType> entityType = new AtomicReference<EntitySpawnerType>( EntitySpawnerType.UNKNOWN );
 		AtomicInteger entityTypeWeight = new AtomicInteger( 0 );
 		
-		ItemStack spawnerItem = NBTUtils.editItemStackNBT( new ItemStack( Material.MOB_SPAWNER ), spawnerItemNbt -> {
+		ItemStack spawnerItem = NBTUtils.editItemStackNBT( new ItemStack( Material.SPAWNER ), spawnerItemNbt -> {
 			
 			NBTTagCompound movableSpawnerNbt = new NBTTagCompound();
 			spawnerItemNbt.set( SPAWNER_ITEM_NBT_KEY, movableSpawnerNbt );
@@ -347,7 +347,7 @@ public class MovableSpawner extends JavaPlugin {
 					
 					for ( int i = 0; i < spawnPotentials.size(); i++ ) {
 						
-						NBTTagCompound spawnPotential = spawnPotentials.get( i );
+						NBTTagCompound spawnPotential = spawnPotentials.getCompound( i );
 						
 						NBTUtils.getNBTCompound( spawnPotential, "Entity", potentialEntity -> {
 							
@@ -398,7 +398,7 @@ public class MovableSpawner extends JavaPlugin {
 	}
 	
 	public boolean validSpawnerItem(ItemStack stack) {
-		if ( stack == null || stack.getType() != Material.MOB_SPAWNER ) return false;
+		if ( stack == null || stack.getType() != Material.SPAWNER ) return false;
 		return NBTUtils.checkItemStackNBT( stack, nbt -> nbt.hasKey( SPAWNER_ITEM_NBT_KEY ) && ( nbt.get( SPAWNER_ITEM_NBT_KEY ) instanceof NBTTagCompound ) );
 	}
 	
@@ -442,7 +442,7 @@ public class MovableSpawner extends JavaPlugin {
 					
 					block = world.getBlockAt( x + offX, y + offY, z + offZ );
 					
-					if ( block.getType() == Material.MOB_SPAWNER ) return false;
+					if ( block.getType() == Material.SPAWNER ) return false;
 					
 				}
 			}

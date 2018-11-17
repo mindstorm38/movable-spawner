@@ -54,7 +54,7 @@ public class EventListener implements Listener {
 			
 		}
 		
-		if ( block.getType() == Material.MOB_SPAWNER ) {
+		if ( block.getType() == Material.SPAWNER ) {
 			
 			Player player = e.getPlayer();
 			
@@ -112,7 +112,7 @@ public class EventListener implements Listener {
 			
 		}
 		
-		if ( spawnerBlock.getType() == Material.MOB_SPAWNER ) {
+		if ( spawnerBlock.getType() == Material.SPAWNER ) {
 			
 			ItemStack handItem = e.getItemInHand();
 			
