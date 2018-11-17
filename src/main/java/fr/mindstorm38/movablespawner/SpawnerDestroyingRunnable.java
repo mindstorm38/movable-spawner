@@ -5,13 +5,10 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.TrapDoor;
 import org.bukkit.util.Vector;
 
 public class SpawnerDestroyingRunnable implements Runnable {
@@ -75,6 +72,7 @@ public class SpawnerDestroyingRunnable implements Runnable {
 	@Override
 	public void run() {
 		
+		/*
 		int maxHeight = this.world.getMaxHeight();
 		
 		for ( int offX = -MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offX <= MovableSpawner.SPAWNER_ANIMATION_CLEAR_ZONE; offX++ ) {
@@ -98,6 +96,7 @@ public class SpawnerDestroyingRunnable implements Runnable {
 				}
 			}
 		}
+		*/
 		
 		this.plugin.runSync( () -> {
 			
@@ -105,6 +104,7 @@ public class SpawnerDestroyingRunnable implements Runnable {
 			
 		} );
 		
+		/*
 		safesleep( 600L );
 		
 		for ( BlockFace face : HORIZONTAL_FACES ) {
@@ -120,8 +120,9 @@ public class SpawnerDestroyingRunnable implements Runnable {
 			this.placeTrapdoor( face, true );
 			
 		}
+		*/
 		
-		safesleep( 500L );
+		safesleep( 1000L );
 		
 		this.plugin.runSync( () -> {
 			
@@ -149,6 +150,7 @@ public class SpawnerDestroyingRunnable implements Runnable {
 		
 		this.plugin.runSync( () -> {
 			
+			/*
 			for ( BlockFace face : FACES ) {
 				
 				int locX = this.x + face.getModX();
@@ -159,6 +161,7 @@ public class SpawnerDestroyingRunnable implements Runnable {
 				block.setType( Material.AIR );
 				
 			}
+			*/
 			
 			this.world.getBlockAt( this.spawnerLocation ).setType( Material.AIR );
 			
@@ -196,6 +199,7 @@ public class SpawnerDestroyingRunnable implements Runnable {
 		
 	}
 	
+	/*
 	private void placeTrapdoor(BlockFace face, boolean vertical) {
 		
 		final int locX = this.x + face.getModX();
@@ -226,6 +230,7 @@ public class SpawnerDestroyingRunnable implements Runnable {
 		} );
 		
 	}
+	*/
 	
 	public static void safesleep(long time) {
 		try { Thread.sleep( time ); } catch (InterruptedException e) {}

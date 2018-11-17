@@ -1,6 +1,7 @@
 package fr.mindstorm38.movablespawner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +33,8 @@ public class MovableSpawner extends JavaPlugin {
 	
 	// Constants \\
 	
-	public static final int SPAWNER_ZONE_RADIUS_XZ			= 16;
-	public static final int SPAWNER_ZONE_RADIUS_Y			= 24;
+	public static final int SPAWNER_ZONE_RADIUS_XZ			= 4;
+	public static final int SPAWNER_ZONE_RADIUS_Y			= 4;
 	
 	public static final int SPAWNER_ZONE_SIZE_XZ			= SPAWNER_ZONE_RADIUS_XZ * 2 + 1;
 	public static final int SPAWNER_ZONE_SIZE_Y				= SPAWNER_ZONE_RADIUS_Y * 2 + 1;
@@ -129,7 +130,7 @@ public class MovableSpawner extends JavaPlugin {
 		
 		if ( this.toolItem == null ) {
 			
-			this.toolItem = NBTUtils.editItemStackNBT( new ItemStack( Material.RECORD_8 ), nbt -> {
+			this.toolItem = NBTUtils.editItemStackNBT( new ItemStack( Material.BLAZE_ROD ), nbt -> {
 				
 				nbt.setBoolean( SPAWNER_TOOL_KEY, true );
 				return true;
@@ -138,9 +139,10 @@ public class MovableSpawner extends JavaPlugin {
 			
 			ItemMeta itemMeta = this.toolItem.getItemMeta();
 			
-			itemMeta.setDisplayName("§6Spawner tool§r");
+			itemMeta.setDisplayName("§b§lSpawner Stick§r");
 			itemMeta.addItemFlags( ItemFlag.values() );
 			itemMeta.addEnchant( Enchantment.LUCK, 0, true );
+			itemMeta.setLore( Arrays.asList( "§7One Use§r", "§7Haste IV§r", "", "§c[1 Utilisation]§r" ) );
 			
 			this.toolItem.setItemMeta( itemMeta );
 			
@@ -173,7 +175,7 @@ public class MovableSpawner extends JavaPlugin {
 	public void removeOneTool(PlayerInventory inv, boolean usedMainHandItem) {
 		
 		boolean giveRareRecord = this.random.nextFloat() <= RARE_RECORD_CHANCE;
-		ItemStack rareRecordItem = new ItemStack( Material.RECORD_11 );
+		ItemStack rareRecordItem = new ItemStack( Material.BLAZE_POWDER );
 		
 		ItemStack mainHandItem = inv.getItemInMainHand();
 		
@@ -218,6 +220,7 @@ public class MovableSpawner extends JavaPlugin {
 	
 	public boolean canInterractAt(Location loc) {
 		
+		/*
 		int x = loc.getBlockX();
 		int y = loc.getBlockY();
 		int z = loc.getBlockZ();
@@ -233,6 +236,7 @@ public class MovableSpawner extends JavaPlugin {
 			if ( z >= ( locZ - SPAWNER_ANIMATION_CLEAR_ZONE ) || z <= ( locZ + SPAWNER_ANIMATION_CLEAR_ZONE ) ) return false;
 			
 		}
+		*/
 		
 		return true;
 		
@@ -240,6 +244,7 @@ public class MovableSpawner extends JavaPlugin {
 	
 	public boolean canBreakSpawner(Location loc, Player player) {
 		
+		/*
 		World world = loc.getWorld();
 		int x = loc.getBlockX();
 		int y = loc.getBlockY();
@@ -262,6 +267,7 @@ public class MovableSpawner extends JavaPlugin {
 				}
 			}
 		}
+		*/
 		
 		return true;
 		
