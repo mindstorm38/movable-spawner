@@ -9,7 +9,7 @@ apply plugin: 'eclipse'
 
 project.ext.craftbukkit = "1.12.2-R0.1-SNAPSHOT"
 
-version = "1.0.0"
+version = "1.0.1"
 
 libsDirName = "../server/plugins/"
 compileJava.options.encoding = "UTF-8"
