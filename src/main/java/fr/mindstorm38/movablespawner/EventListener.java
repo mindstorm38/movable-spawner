@@ -49,6 +49,7 @@ public class EventListener implements Listener {
 		if ( !this.plugin.canInterractAt( blockLocation ) ) {
 			
 			e.setCancelled( true );
+			e.getPlayer().sendMessage("§cImpossible d'intéragir dans cette zone, destruction de spawner en cours§r");
 			return;
 			
 		}
@@ -78,8 +79,12 @@ public class EventListener implements Listener {
 								this.plugin.breakSpawner( (CreatureSpawner) block.getState() );
 								if ( player.getGameMode() != GameMode.CREATIVE ) this.plugin.removeOneTool( playerInv, true );
 								
+							} else {
+								player.sendMessage("§cVous n'avez pas la permission d'utiliser cet outil§r");
 							}
 						
+						} else {
+							player.sendMessage("§cImpossible de casser le spawner, une zone de 3x3 centré sur le spawner ne peut pas être détruite§r");
 						}
 						
 					}
@@ -102,6 +107,7 @@ public class EventListener implements Listener {
 		if ( !this.plugin.canInterractAt( spawnerBlock.getLocation() ) ) {
 			
 			e.setCancelled( true );
+			e.getPlayer().sendMessage("§cImpossible d'intéragir dans cette zone, destruction de spawner en cours§r");
 			return;
 			
 		}
@@ -145,6 +151,8 @@ public class EventListener implements Listener {
 						
 					}
 					
+				} else {
+					player.sendMessage("§cVous n'avez pas la permission d'utiliser cet outil§r");
 				}
 				
 			}
