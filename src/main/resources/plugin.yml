@@ -2,6 +2,7 @@ name: MovableSpawner
 version: 1.1.2-pre1
 author: Mindstorm38
 main: fr.mindstorm38.movablespawner.MovableSpawner
+api-version: 1.13
 commands:
   mstool:
     description: Give the MovableSpawner tool
