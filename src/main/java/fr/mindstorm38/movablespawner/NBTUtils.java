@@ -3,39 +3,39 @@ package fr.mindstorm38.movablespawner;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 
-import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 
-import net.minecraft.server.v1_13_R1.ItemStack;
-import net.minecraft.server.v1_13_R1.NBTBase;
-import net.minecraft.server.v1_13_R1.NBTTagCompound;
-import net.minecraft.server.v1_13_R1.NBTTagInt;
-import net.minecraft.server.v1_13_R1.NBTTagList;
-import net.minecraft.server.v1_13_R1.NBTTagShort;
-import net.minecraft.server.v1_13_R1.NBTTagString;
-import net.minecraft.server.v1_13_R1.TileEntity;
+import net.minecraft.server.v1_13_R2.BlockPosition;
+import net.minecraft.server.v1_13_R2.ItemStack;
+import net.minecraft.server.v1_13_R2.NBTBase;
+import net.minecraft.server.v1_13_R2.NBTTagCompound;
+import net.minecraft.server.v1_13_R2.NBTTagInt;
+import net.minecraft.server.v1_13_R2.NBTTagList;
+import net.minecraft.server.v1_13_R2.NBTTagShort;
+import net.minecraft.server.v1_13_R2.NBTTagString;
+import net.minecraft.server.v1_13_R2.TileEntity;
 
 public class NBTUtils {
 
 	public static void getNBTShort(NBTTagCompound compound, String identifier, Consumer<Short> consumer) {
 		NBTBase base = compound.get( identifier );
 		if ( base == null || !( base instanceof NBTTagShort ) ) return;
-		consumer.accept( ( (NBTTagShort) base ).f() );
+		consumer.accept( ( (NBTTagShort) base ).asShort() );
 	}
 	
 	public static void getNBTInteger(NBTTagCompound compound, String identifier, Consumer<Integer> consumer) {
 		NBTBase base = compound.get( identifier );
 		if ( base == null || !( base instanceof NBTTagInt ) ) return;
-		consumer.accept( ( (NBTTagInt) base ).e() );
+		consumer.accept( ( (NBTTagInt) base ).asInt() );
 	}
 	
 	public static void getNBTString(NBTTagCompound compound, String identifier, Consumer<String> consumer) {
 		NBTBase base = compound.get( identifier );
 		if ( base == null || !( base instanceof NBTTagString ) ) return;
-		consumer.accept( ( (NBTTagString) base ).b_() );
+		consumer.accept( ( (NBTTagString) base ).asString() );
 	}
 	
 	public static void getNBTBase(NBTTagCompound compound, String identifier, Consumer<NBTBase> consumer) {
@@ -55,13 +55,14 @@ public class NBTUtils {
 		if ( base == null || !( base instanceof NBTTagList ) ) return;
 		consumer.accept( ( (NBTTagList) base ) );
 	}
+
+	public static TileEntity getTileEntity(BlockState state) {
+		return ( (CraftWorld) state.getWorld() ).getHandle().getTileEntity( new BlockPosition( state.getX(), state.getY(), state.getZ() ) );
+	}
 	
 	public static NBTTagCompound getTileEntityNBT(BlockState state) {
 		
-		Location location = state.getLocation();
-		CraftWorld worldRaw = (CraftWorld) location.getWorld();
-		
-		TileEntity tileEntity = worldRaw.getTileEntityAt( location.getBlockX(), location.getBlockY(), location.getBlockZ() );
+		TileEntity tileEntity = getTileEntity(state);
 		
 		NBTTagCompound compound = new NBTTagCompound();
 		tileEntity.save( compound );
@@ -71,11 +72,7 @@ public class NBTUtils {
 
 	public static void setTileEntityNBT(BlockState state, NBTTagCompound nbt) {
 		
-		Location location = state.getLocation();
-		CraftWorld worldRaw = (CraftWorld) location.getWorld();
-		
-		TileEntity tileEntity = worldRaw.getTileEntityAt( location.getBlockX(), location.getBlockY(), location.getBlockZ() );
-		
+		TileEntity tileEntity = getTileEntity(state);
 		tileEntity.load( nbt );
 		tileEntity.update();
 		
@@ -83,10 +80,7 @@ public class NBTUtils {
 	
 	public static void editTileEntityNBT(BlockState state, Function<NBTTagCompound, Boolean> nbtProcessor) {
 		
-		Location location = state.getLocation();
-		CraftWorld worldRaw = (CraftWorld) location.getWorld();
-		
-		TileEntity tileEntity = worldRaw.getTileEntityAt( location.getBlockX(), location.getBlockY(), location.getBlockZ() );
+		TileEntity tileEntity = getTileEntity(state);
 		
 		NBTTagCompound tileEntityNbt = new NBTTagCompound();
 		tileEntity.save( tileEntityNbt );
